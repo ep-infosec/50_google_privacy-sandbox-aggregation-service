@@ -1,0 +1,73 @@
+// Copyright 2021 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package convagg.crypto;
+
+// For compatibility with protobuf lite.
+option optimize_for = LITE_RUNTIME;
+
+import "dpf/distributed_point_function.proto";
+
+// StandardCiphertext holds a ciphertext encrypted under the
+// ECIES-HKDF-AES128GCM encryption scheme.
+message StandardCiphertext {
+  bytes data = 1;
+}
+
+// Public key in ECIES-HKDF-AES128GCM encryption scheme.
+message StandardPublicKey {
+  bytes key = 1 ;
+}
+
+// Private key in ECIES-HKDF-AES128GCM encryption scheme.
+message StandardPrivateKey {
+  bytes key = 1 ;
+}
+
+// The DPF key share for 'SUM' from a conversion record.
+message PartialReportDpf {
+  distributed_point_functions.DpfKey sum_key = 1;
+}
+
+// AggregatablePayload contains the encrypted or debug payload for both the
+// one-party and MPC designs.
+message AggregatablePayload {
+  StandardCiphertext payload = 1;
+  // Context info for decrypting the payload if it is encrypted.
+  string shared_info = 2;
+  // The ID to find the corresponding private key for decryption, which is
+  // empty for debug cleartext payloads.
+  string key_id = 3;
+}
+
+// PartialAggregationDpf contains the aggregation results from one of the
+// helpers for one specific bucket of the histogram.
+message PartialAggregationDpf {
+  uint64 partial_sum = 1;
+}
+
+// DomainPrefixes contains the prefixes to expand the DPF keys in a certain
+// domain.
+message DomainPrefixes {
+  repeated uint64 prefix = 1;
+}
+
+// IncrementalDpfParameters contains DPF parameters for key generation and
+// expansion in each of the hierarchical domains.
+message IncrementalDpfParameters {
+  repeated distributed_point_functions.DpfParameters params = 1;
+}
+
